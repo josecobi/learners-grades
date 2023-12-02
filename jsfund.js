@@ -9,6 +9,6 @@
 
 // Store results(use an array?)
 
-// Create a function to get learners' data 
 
 //USE FUNCTIONS TO RETURN THE RESULTS
+// Create a function invoking the other functions to get learners' data and output results
