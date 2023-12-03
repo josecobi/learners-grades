@@ -1,4 +1,4 @@
-// Understand data structures
+// Define data structures
 const CourseInfo = {
     id: 451,
     name: "Introduction to JavaScript"
@@ -81,6 +81,42 @@ const CourseInfo = {
 
 // Calculate weighted average
 
+function calculateWeightedAverage(ag, submissions){
+    //create an array of ids to be used to iterate through submissions
+    let listOfLearnersId = [];
+    submissions.forEach((submission) =>{
+        listOfLearnersId.push(submission.learner_id);
+    })
+    //remove duplicate ids
+    const listUniqLearnersId = Array.from(new Set(listOfLearnersId));
+  
+
+    //loop through the list of learners id and access the submissions using each id
+    const sumPointsObj = {}; 
+    
+    for(id of listUniqLearnersId){
+        submissions.reduce((totalPoints, obj) =>{
+            
+            if(obj.learner_id === id){
+                
+                sumPointsObj.totalPoints +=  obj.submission.score ;
+                sumPointsObj.learner_id = id;
+            }
+            
+            return totalPoints;
+        }, 0)
+        
+        const pointsPossible = ag.assignments.reduce((totalPointsPossible, assignmentObj) => {
+            // console.log("totalpointspossible: " + totalPointsPossible + " asspointposs: " + assignmentObj.points_possible);
+            return (totalPointsPossible + assignmentObj.points_possible);
+        }, 0)
+
+        // return (sumOfPoints / pointsPossible);
+    }
+    console.log(sumPointsObj);
+}
+
+ console.log(calculateWeightedAverage(AssignmentGroup, LearnerSubmissions));
 // Calculate scores for each assignment(% and late submissions)
 
 // Store results(use an array)
@@ -108,6 +144,6 @@ const CourseInfo = {
   //CALL THE MAIN FUNCTION TO TEST RESULTS
   const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
   
-  console.log(result);
+//   console.log(result);
   
 
