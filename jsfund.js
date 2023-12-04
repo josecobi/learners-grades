@@ -92,28 +92,31 @@ function calculateWeightedAverage(ag, submissions){
   
 
     //loop through the list of learners id and access the submissions using each id
-    const sumPointsObj = {}; 
+    const learnersSummaries = []; 
     
     for(id of listUniqLearnersId){
-        submissions.reduce((totalPoints, obj) =>{
-            
-            if(obj.learner_id === id){
-                
-                sumPointsObj.totalPoints +=  obj.submission.score ;
-                sumPointsObj.learner_id = id;
-            }
-            
-            return totalPoints;
-        }, 0)
-        
-        const pointsPossible = ag.assignments.reduce((totalPointsPossible, assignmentObj) => {
-            // console.log("totalpointspossible: " + totalPointsPossible + " asspointposs: " + assignmentObj.points_possible);
-            return (totalPointsPossible + assignmentObj.points_possible);
-        }, 0)
+       let learnerSummary = {
+        learner_id: id,
+        totalPoints: 0
+       };
 
+       submissions.forEach((obj) =>{
+          if(obj.learner_id === id){
+          learnerSummary.totalPoints += obj.submission.score;
+          }
+        });
+
+        learnersSummaries.push(learnerSummary);
+        
+        
+        // const pointsPossible = ag.assignments.reduce((totalPointsPossible, assignmentObj) => {
+        //     return (totalPointsPossible + assignmentObj.points_possible);
+        // }, 0)
+       
         // return (sumOfPoints / pointsPossible);
     }
-    console.log(sumPointsObj);
+    console.log(learnersSummaries);
+    
 }
 
  console.log(calculateWeightedAverage(AssignmentGroup, LearnerSubmissions));
@@ -142,7 +145,7 @@ function calculateWeightedAverage(ag, submissions){
   }
  
   //CALL THE MAIN FUNCTION TO TEST RESULTS
-  const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
+  // const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
   
 //   console.log(result);
   
