@@ -79,7 +79,6 @@ const CourseInfo = {
 //DECLARE FUNCTIONS
 // Implement data validation logic(Check for errors in course Ids- try...catch)
 
-// Calculate weighted average
 
 //create list of learners
 function createListLearnersIds (submissions){
@@ -93,50 +92,47 @@ function createListLearnersIds (submissions){
 }
 
 // Get assignments due in the past
-//>>>>>>>>>>>>>>>>>>>>>>>>>>>TO-DO check if this can be done using the method filter
 function getPastDueAssignments(ag) {
   const currentDate = new Date();
   return ag.assignments.filter((assignment) => new Date(assignment.due_at) <= currentDate)
 .map((assignment) => assignment.id);
 }
+// Check if the assignment was submitted late
+function isLateSubmission(submittedAt, dueAt) {
+  const submittedDate = new Date(submittedAt);
+  const dueDate = new Date(dueAt);
 
+  // Compare the submitted date with the due date
+  return submittedDate > dueDate;
+}
+// Calculate scores for each assignment(% and late submissions)
+function deduct10(points){
+  points = points * 0.9;
+  return points;
+}
+
+function percentScoredPerAssignment(submission, learnerId, ag){
+
+}
 
 // Calculate total points each learner earned
 function calculateTotalPointsLearner(submissions, learnerId, ag){
   let totalPoints = 0;
   const pastDueAssignments = getPastDueAssignments(ag);
 
-  submissions.forEach((obj) =>{
+  submissions.forEach((obj) => {
       if(obj.learner_id === learnerId && pastDueAssignments.includes(obj.assignment_id)){
+        if(late){
+          totalPoints += deduct10(obj.submission.score);
+        }
+        else{
           totalPoints += obj.submission.score;
+        }
       }
   });
   return totalPoints;
 }
-// function calculateTotalPointsLearner(submissions, ag){
-//   const pastDueAssignments = getPastDueAssignments(ag);
- 
 
-//   const listUniqLearnersId = createListLearnersIds (submissions);
-//   // Loop through the list of learners ids and access the submissions using each id
-//   const learnersSummaries = []; 
-  
-//   for(const id of listUniqLearnersId){
-//      let learnerSummary = {
-//       learner_id: id,
-//       totalPoints: 0,
-//      };
-//      // Iterate through each learners submission check the submission date and add points to total only if the assignment was due in the past.
-//      submissions.forEach((obj) =>{
-//         if(obj.learner_id === id && pastDueAssignments.includes(obj.assignment_id)){
-//         learnerSummary.totalPoints += obj.submission.score;
-//         }
-//       });
-
-//       learnersSummaries.push(learnerSummary);
-//   }
-//   return (learnersSummaries);
-// }
 
 // Calculate the sum of the points of all the assignments due till the current date
 function calculateTotalPointsPossible(ag){
@@ -147,19 +143,17 @@ function calculateTotalPointsPossible(ag){
         sumOfPoints += assignment.points_possible;
       }
   }
-  // console.log(`sum of points: `, sumOfPoints);
   return sumOfPoints;
 }
-//  console.log(`points earned on activities: `, calculateTotalPointsLearner(LearnerSubmissions, 125, AssignmentGroup));
-//  console.log(`total points possible: `, calculateTotalPointsPossible(AssignmentGroup));
+
+
 
  function calculateWeightedAverage (totalScore, pointsPossible){
   const weightedAverage = totalScore / pointsPossible;
   return weightedAverage;
 }
-// Calculate scores for each assignment(% and late submissions)
 
-// Store results(use an array)
+
 
 
 //USE HELPERS TO RETURN THE RESULTS
@@ -167,23 +161,23 @@ function calculateTotalPointsPossible(ag){
 // The provided course information.
 
   
-  function getLearnerData(course, ag, submissions) {
-    // here, we would process this data to achieve the desired result.
-    const listOfLearnersId = createListLearnersIds (submissions);
-    const totalPointsPossible = calculateTotalPointsPossible(ag);
+function getLearnerData(course, ag, submissions) {
+  // here, we would process this data to achieve the desired result.
+  const listOfLearnersId = createListLearnersIds (submissions);
+  const totalPointsPossible = calculateTotalPointsPossible(ag);
 
-    const result = [];
-    for(let learnerId of listOfLearnersId){
-      const learnerSummary = {}
-      let totalScore = calculateTotalPointsLearner(submissions, learnerId, ag);
-      let weightedAverage = calculateWeightedAverage (totalScore, totalPointsPossible);
-      learnerSummary.id = learnerId;
-      learnerSummary.avg = weightedAverage;
-      result.push(learnerSummary);
-    }
-    return result;
+  const result = [];
+  for(let learnerId of listOfLearnersId){
+    const learnerSummary = {}
+    let totalScore = calculateTotalPointsLearner(submissions, learnerId, ag);
+    let weightedAverage = calculateWeightedAverage (totalScore, totalPointsPossible);
+    learnerSummary.id = learnerId;
+    learnerSummary.avg = weightedAverage;
+    result.push(learnerSummary);
   }
- 
+  return result;
+}
+
   //CALL THE MAIN FUNCTION TO TEST RESULTS
   const result = getLearnerData(CourseInfo, AssignmentGroup, LearnerSubmissions);
   
