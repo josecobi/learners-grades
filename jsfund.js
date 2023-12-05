@@ -132,10 +132,6 @@ function deduct10(points){
   return points;
 }
 
-function percentScoredPerAssignment(submission, learnerId, ag){
-
-}
-
 // Calculate total points each learner earned
 function calculateTotalPointsLearner(submissions, learnerId, ag){
   validateCourseAssignment(ag);
@@ -181,7 +177,7 @@ function calculatePercentage(submissions, learnerId, ag){
   });
   return learnerPercentage;
 }
-console.log(`percentage: `, calculatePercentage(LearnerSubmissions, 125, AssignmentGroup));
+// console.log(`percentage: `, calculatePercentage(LearnerSubmissions, 125, AssignmentGroup));
 
 
 // Calculate the sum of the points of all the assignments due till the current date
@@ -213,16 +209,23 @@ function calculateTotalPointsPossible(ag){
   
 function getLearnerData(course, ag, submissions) {
   // here, we would process this data to achieve the desired result.
-  const listOfLearnersId = createListLearnersIds (submissions);
+  const listOfLearnersId = createListLearnersIds(submissions);
   const totalPointsPossible = calculateTotalPointsPossible(ag);
 
   const result = [];
-  for(let learnerId of listOfLearnersId){
-    const learnerSummary = {}
+  for (let learnerId of listOfLearnersId) {
+    const percentages = calculatePercentage(submissions, learnerId, ag);
+    const learnerSummary = { id: learnerId, avg: 0 }; 
+
     let totalScore = calculateTotalPointsLearner(submissions, learnerId, ag);
-    let weightedAverage = calculateWeightedAverage (totalScore, totalPointsPossible);
-    learnerSummary.id = learnerId;
+    let weightedAverage = calculateWeightedAverage(totalScore, totalPointsPossible);
     learnerSummary.avg = weightedAverage;
+
+    // Add assignment percentages to learnerSummary
+    for (let assignment in percentages) {
+      learnerSummary[assignment] = percentages[assignment];
+    }
+
     result.push(learnerSummary);
   }
   return result;
