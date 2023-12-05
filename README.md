@@ -32,3 +32,5 @@ To utilize this tool, provide the necessary course information (CourseInfo), ass
 Instructions
 
     
+## Screenshot
+![Screenshot 2023-12-05 003138](https://github.com/josecobi/learners-grades/assets/58313777/3deba237-b216-450e-b3a7-7a09579704f5)
