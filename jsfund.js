@@ -97,6 +97,15 @@ function getPastDueAssignments(ag) {
   return ag.assignments.filter((assignment) => new Date(assignment.due_at) <= currentDate)
 .map((assignment) => assignment.id);
 }
+//Get due date by assignment ID
+function getDueDateById(ag, assignmentId){
+    for(let assignment of ag.assignments){
+      if(assignment.id === assignmentId){
+        return assignment.due_at;
+      }
+    }
+}
+
 // Check if the assignment was submitted late
 function isLateSubmission(submittedAt, dueAt) {
   const submittedDate = new Date(submittedAt);
@@ -122,12 +131,12 @@ function calculateTotalPointsLearner(submissions, learnerId, ag){
 
   submissions.forEach((obj) => {
       if(obj.learner_id === learnerId && pastDueAssignments.includes(obj.assignment_id)){
-        if(late){
-          totalPoints += deduct10(obj.submission.score);
-        }
-        else{
-          totalPoints += obj.submission.score;
-        }
+          const isLate = isLateSubmission(obj.submission.submitted_at, getDueDateById(ag, obj.assignment_id));
+          if (isLate) {
+            totalPoints += deduct10(obj.submission.score);
+          } else {
+            totalPoints += obj.submission.score;
+          }
       }
   });
   return totalPoints;
