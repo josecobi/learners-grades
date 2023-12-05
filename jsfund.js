@@ -79,6 +79,16 @@ const CourseInfo = {
 //DECLARE FUNCTIONS
 // Implement data validation logic(Check for errors in course Ids- try...catch)
 
+function validateCourseAssignment(ag) {
+    try {
+      if (ag.course_id !== CourseInfo.id) {
+        throw new Error('AssignmentGroup does not belong to its course. Invalid input.');
+      }
+    } 
+    catch (error) {
+      console.error(error.message);
+    }
+}
 
 //create list of learners
 function createListLearnersIds (submissions){
@@ -97,12 +107,14 @@ function getPastDueAssignments(ag) {
   return ag.assignments.filter((assignment) => new Date(assignment.due_at) <= currentDate)
 .map((assignment) => assignment.id);
 }
+
 //Get due date by assignment ID
 function getDueDateById(ag, assignmentId){
     for(let assignment of ag.assignments){
       if(assignment.id === assignmentId){
         return assignment.due_at;
       }
+      else{""}
     }
 }
 
@@ -126,6 +138,7 @@ function percentScoredPerAssignment(submission, learnerId, ag){
 
 // Calculate total points each learner earned
 function calculateTotalPointsLearner(submissions, learnerId, ag){
+  validateCourseAssignment(ag);
   let totalPoints = 0;
   const pastDueAssignments = getPastDueAssignments(ag);
 
@@ -142,12 +155,40 @@ function calculateTotalPointsLearner(submissions, learnerId, ag){
   return totalPoints;
 }
 
+//Calculate percentage
+function calculatePercentage(submissions, learnerId, ag){
+  validateCourseAssignment(ag);
+  const pastDueAssignments = getPastDueAssignments(ag);
+  const learnerPercentage = {};
+
+  submissions.forEach((obj) => {
+
+      if(obj.learner_id === learnerId && pastDueAssignments.includes(obj.assignment_id)){         
+          const isLate = isLateSubmission(obj.submission.submitted_at, getDueDateById(ag, obj.assignment_id));
+
+          if (isLate) {
+           
+            const pointsPossible = ag.assignments.find(assignment => assignment.id === obj.assignment_id).points_possible;
+           
+            learnerPercentage[obj.assignment_id] = deduct10(obj.submission.score)/ pointsPossible;
+            
+          } else {
+            const pointsPossible = ag.assignments.find(assignment => assignment.id === obj.assignment_id).points_possible;
+            learnerPercentage[obj.assignment_id] = obj.submission.score / pointsPossible;
+          }
+
+      }
+  });
+  return learnerPercentage;
+}
+console.log(`percentage: `, calculatePercentage(LearnerSubmissions, 125, AssignmentGroup));
+
 
 // Calculate the sum of the points of all the assignments due till the current date
 function calculateTotalPointsPossible(ag){
   const pastDueAssignments = getPastDueAssignments(ag);
   let sumOfPoints = 0;
-  for( let assignment of ag.assignments){
+  for(let assignment of ag.assignments){
       if(pastDueAssignments.includes(assignment.id)){
         sumOfPoints += assignment.points_possible;
       }
