@@ -15,7 +15,7 @@ const CourseInfo = {
         id: 1,
         name: "Declare a Variable",
         due_at: "2023-01-25",
-        points_possible: 50
+        points_possible: 'a'
       },
       {
         id: 2,
@@ -79,16 +79,18 @@ const CourseInfo = {
 //DECLARE FUNCTIONS
 // Implement data validation logic(Check for errors in course Ids- try...catch)
 
-function validateCourseAssignment(ag) {
+function validateCourseInfo(ag) {
     try {
       if (ag.course_id !== CourseInfo.id) {
-        throw new Error('AssignmentGroup does not belong to its course. Invalid input.');
+        throw new Error('Error: AssignmentGroup does not belong to its course. Invalid input.');
       }
     } 
     catch (error) {
       console.error(error.message);
     }
 }
+
+
 
 //create list of learners
 function createListLearnersIds (submissions){
@@ -103,9 +105,29 @@ function createListLearnersIds (submissions){
 
 // Get assignments due in the past
 function getPastDueAssignments(ag) {
+  let assignmentsDueInPast = [];
   const currentDate = new Date();
-  return ag.assignments.filter((assignment) => new Date(assignment.due_at) <= currentDate)
-.map((assignment) => assignment.id);
+  for (let assignment of ag.assignments){
+      try{
+          if(assignment.points_possible <= 0 || isNaN(assignment.points_possible)) {
+            throw new Error(`Error: Assignment "${assignment.name}" has 0 points possible or is not a valid number.`); 
+          }
+
+          const dueDate = new Date(assignment.due_at);
+          if(dueDate <= currentDate) {
+              assignmentsDueInPast.push(assignment.id);
+          }
+
+      }
+      catch (error) {
+        console.error(error.message)
+      }
+      finally{
+        continue;
+      }
+  }
+  return assignmentsDueInPast;
+
 }
 
 //Get due date by assignment ID
@@ -134,7 +156,7 @@ function deduct10(points){
 
 // Calculate total points each learner earned
 function calculateTotalPointsLearner(submissions, learnerId, ag){
-  validateCourseAssignment(ag);
+  validateCourseInfo(ag);
   let totalPoints = 0;
   const pastDueAssignments = getPastDueAssignments(ag);
 
@@ -153,7 +175,9 @@ function calculateTotalPointsLearner(submissions, learnerId, ag){
 
 //Calculate percentage
 function calculatePercentage(submissions, learnerId, ag){
-  validateCourseAssignment(ag);
+  validateCourseInfo(ag);
+  
+ 
   const pastDueAssignments = getPastDueAssignments(ag);
   const learnerPercentage = {};
 
@@ -182,19 +206,23 @@ function calculatePercentage(submissions, learnerId, ag){
 
 // Calculate the sum of the points of all the assignments due till the current date
 function calculateTotalPointsPossible(ag){
+
   const pastDueAssignments = getPastDueAssignments(ag);
   let sumOfPoints = 0;
   for(let assignment of ag.assignments){
       if(pastDueAssignments.includes(assignment.id)){
         sumOfPoints += assignment.points_possible;
       }
+      else{
+        continue;
+      }
   }
   return sumOfPoints;
 }
 
 
-
  function calculateWeightedAverage (totalScore, pointsPossible){
+
   const weightedAverage = totalScore / pointsPossible;
   return weightedAverage;
 }
