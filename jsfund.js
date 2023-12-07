@@ -15,7 +15,7 @@ const CourseInfo = {
         id: 1,
         name: "Declare a Variable",
         due_at: "2023-01-25",
-        points_possible: 'a'
+        points_possible: 50
       },
       {
         id: 2,
@@ -181,7 +181,6 @@ function calculatePercentage(submissions, learnerId, ag){
   });
   return learnerPercentage;
 }
-// console.log(`percentage: `, calculatePercentage(LearnerSubmissions, 125, AssignmentGroup));
 
 
 // Calculate the sum of the points of all the assignments due till the current date
