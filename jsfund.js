@@ -105,29 +105,9 @@ function createListLearnersIds (submissions){
 
 // Get assignments due in the past
 function getPastDueAssignments(ag) {
-  let assignmentsDueInPast = [];
   const currentDate = new Date();
-  for (let assignment of ag.assignments){
-      try{
-          if(assignment.points_possible <= 0 || isNaN(assignment.points_possible)) {
-            throw new Error(`Error: Assignment "${assignment.name}" has 0 points possible or is not a valid number.`); 
-          }
-
-          const dueDate = new Date(assignment.due_at);
-          if(dueDate <= currentDate) {
-              assignmentsDueInPast.push(assignment.id);
-          }
-
-      }
-      catch (error) {
-        console.error(error.message)
-      }
-      finally{
-        continue;
-      }
-  }
-  return assignmentsDueInPast;
-
+  return ag.assignments.filter((assignment) => new Date(assignment.due_at) <= currentDate && assignment.points_possible !== 0 && !isNaN(assignment.points_possible))
+.map((assignment) => assignment.id);
 }
 
 //Get due date by assignment ID
@@ -210,12 +190,20 @@ function calculateTotalPointsPossible(ag){
   const pastDueAssignments = getPastDueAssignments(ag);
   let sumOfPoints = 0;
   for(let assignment of ag.assignments){
-      if(pastDueAssignments.includes(assignment.id)){
-        sumOfPoints += assignment.points_possible;
+      try {
+          if (assignment.points_possible <= 0 || isNaN(assignment.points_possible)) {
+            throw new Error(`Error: Assignment "${assignment.name}" has 0 points possible or is not a valid number.`);
+          }
+          if(pastDueAssignments.includes(assignment.id)){
+            sumOfPoints += assignment.points_possible;
+          }
+          else{
+            continue;
+          }
       }
-      else{
-        continue;
-      }
+        catch(error){
+          console.error(error.message);
+        }
   }
   return sumOfPoints;
 }
